@@ -46,7 +46,13 @@
             <span
               v-if="data"
               class="font-medium text-sm sm:text-base"
-              :class="coinChangesData.color"
+              :class="
+                coinChangesData.color === 'green'
+                  ? 'text-green-500'
+                  : coinChangesData.color === 'red'
+                  ? 'text-red-500'
+                  : 'text-gray-500'
+              "
             >
               {{ coinChangesData.value }}
             </span>

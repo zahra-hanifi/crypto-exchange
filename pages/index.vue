@@ -50,9 +50,15 @@
       <template #change="{item}">
         <span
           class="text-xs sm:text-sm"
-          :class="getCoinChangeData(item.price_change_percentage_24h).color"
+          :class="
+            changePercentage(item).color === 'green'
+              ? 'text-green-500'
+              : changePercentage(item).color === 'red'
+              ? 'text-red-500'
+              : 'text-gray-500'
+          "
         >
-          {{ getCoinChangeData(item.price_change_percentage_24h).value }}
+          {{ changePercentage(item).value }}
         </span>
       </template>
 
@@ -157,6 +163,9 @@ export default {
         }
       }
       this.shownCount = this.shownCount + 20
+    },
+    changePercentage(item) {
+      return this.getCoinChangeData(item.price_change_percentage_24h)
     }
   },
   head() {

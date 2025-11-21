@@ -35,17 +35,17 @@ export function getCoinChangeData(changePercentage) {
 
   if (changePercentage.toFixed(2) > 0) {
     return {
-      color: 'text-green-500',
+      color: 'green',
       value: `+${percentage.toFixed(2)}%`
     }
   } else if (changePercentage.toFixed(2) < 0) {
     return {
-      color: 'text-red-500',
+      color: 'red',
       value: `-${percentage.toFixed(2)}%`
     }
   } else {
     return {
-      color: 'text-gray-500',
+      color: 'gray',
       value: `${percentage.toFixed(2)}%`
     }
   }
