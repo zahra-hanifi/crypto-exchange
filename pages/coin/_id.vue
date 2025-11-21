@@ -10,7 +10,10 @@
             skeleton-class="w-8 sm:w-10 h-8 sm:h-10 rounded-full"
           >
             <template #content>
-              <img :src="data.image.small" class="w-8 sm:w-10 h-8 sm:h-10" />
+              <nuxt-img
+                :src="data.image.small"
+                class="w-8 sm:w-10 h-8 sm:h-10"
+              />
             </template>
           </DataLoader>
 

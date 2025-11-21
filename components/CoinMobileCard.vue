@@ -5,7 +5,7 @@
       class="flex items-center justify-between gap-x-2"
     >
       <div class="flex items-center gap-x-2">
-        <img :src="item.image" class="w-7 h-7" />
+        <nuxt-img :src="item.image" class="w-7 h-7" />
 
         <span class="text-gray-800 text-sm truncate">
           {{ item.name }}
