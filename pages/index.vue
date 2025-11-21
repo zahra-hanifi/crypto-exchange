@@ -3,7 +3,7 @@
     class="bg-white rounded-xl p-4 overflow-y-auto w-full h-full flex flex-col gap-y-4 card"
     ref="wrapper"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
       <h1 class="font-medium text-xl">Currencies List</h1>
 
       <input
@@ -16,7 +16,7 @@
     </div>
 
     <div v-if="loading" class="flex flex-col gap-y-4">
-      <CSkeleton v-for="n in 10" :key="n" class="rounded w-full h-8" />
+      <CSkeleton v-for="n in 10" :key="n" class="rounded w-full h-20 sm:h-8" />
     </div>
 
     <CTable
@@ -179,6 +179,12 @@ export default {
   .card {
     height: 600px;
     width: 700px;
+  }
+}
+
+@media (max-width: 640px) {
+  .card {
+    height: calc(100vh - 61px - 32px);
   }
 }
 </style>

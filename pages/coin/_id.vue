@@ -86,7 +86,7 @@
         <DataLoader :loading="loading" skeleton-class="w-full h-52">
           <template #content>
             <p class="text-gray-500 text-sm leading-6">
-              {{ data.description.en }}
+              {{ data.description.en || 'Nothing found.' }}
             </p>
           </template>
         </DataLoader>

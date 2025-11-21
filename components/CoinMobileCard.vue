@@ -1,10 +1,7 @@
 <template>
-  <div>
-    <nuxt-link
-      :to="`/coin/${item.id}`"
-      class="flex items-center justify-between gap-x-2"
-    >
-      <div class="flex items-center gap-x-2">
+  <div class="w-full">
+    <nuxt-link :to="`/coin/${item.id}`" class="flex flex-col gap-y-4 flex-wrap">
+      <div class="flex items-center gap-x-2 w-full">
         <nuxt-img :src="item.image" class="w-7 h-7" />
 
         <span class="text-gray-800 text-sm truncate">
@@ -16,16 +13,28 @@
         </span>
       </div>
 
-      <span class="text-gray-800 text-xs">
-        ${{ insertComma(item.current_price) }}
-      </span>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-x-1">
+          <span class="text-xs text-gray-700">Current Price:</span>
 
-      <span
-        class="text-xs sm:text-sm"
-        :class="getCoinChangeData(item.price_change_percentage_24h).color"
-      >
-        {{ getCoinChangeData(item.price_change_percentage_24h).value }}
-      </span>
+          <span class="text-gray-800 text-sm font-medium">
+            ${{ insertComma(item.current_price) }}
+          </span>
+        </div>
+
+        <span
+          class="text-xs"
+          :class="
+            coinChangesData.color === 'green'
+              ? 'text-green-500'
+              : coinChangesData.color === 'red'
+              ? 'text-red-500'
+              : 'text-gray-500'
+          "
+        >
+          {{ coinChangesData.value }}
+        </span>
+      </div>
     </nuxt-link>
   </div>
 </template>
@@ -37,6 +46,13 @@ export default {
   name: 'CoinMobileCard',
   props: {
     item: { type: Object, required: true }
+  },
+  computed: {
+    coinChangesData() {
+      if (!this.item) return { value: '', color: '' }
+
+      return this.getCoinChangeData(this.item.price_change_percentage_24h)
+    }
   },
   methods: {
     insertComma,
