@@ -8,29 +8,19 @@
       <thead
         v-show="showHeader"
         :class="{
-          'hidden md:table-header-group': $slots.mobileCard,
-          'sticky top-0 !bg-white dark:!bg-[#1e1e1e] z-10': stickyHeader
+          'hidden md:table-header-group': $scopedSlots['mobileCard'],
+          'sticky top-0 !bg-red-600 z-10': stickyHeader
         }"
       >
         <slot name="headers">
           <tr class="w-full">
-            <!--            <th v-if="selectable" :class="[headerClasses]">
-            <TCheckbox
-              v-model="isAllItemsSelected"
-              @input="toggleSelectAll"
-            />
-          </th>-->
             <th
-              v-for="heading in _headers"
+              v-for="heading in headers"
               :key="heading.value"
-              :class="[
-                headerClasses,
-                getAlignmentClass(heading.align),
-                { 'cursor-pointer': heading.sortable }
-              ]"
-              :dir="heading.dir || undefined"
-              @click="sort(heading.sortable, heading.value)"
-            ></th>
+              :class="[headerClasses, getAlignmentClass(heading.align)]"
+            >
+              {{ heading.text }}
+            </th>
           </tr>
         </slot>
       </thead>
@@ -40,12 +30,12 @@
         </td>
       </template>
       <tbody>
-        <template v-if="$slots.mobileCard">
+        <template v-if="$scopedSlots['mobileCard']">
           <tr
             v-for="(rowItem, key) in slicedItems"
             :key="'mobileCard' + key"
             :class="{
-              'md:hidden': $slots.mobileCard
+              'md:hidden': $scopedSlots['mobileCard']
             }"
           >
             <td
@@ -64,18 +54,17 @@
           :class="[
             rowClasses,
             {
-              'hidden md:table-row': $slots.mobileCard
+              'hidden md:table-row': $scopedSlots['mobileCard']
             }
           ]"
           @click="handleClick(rowItem)"
         >
           <td
-            v-for="(rowData, index) in _headers"
+            v-for="(rowData, index) in headers"
             :key="index"
             :class="[
               getAlignmentClass(rowData.align),
-              sizeClass,
-              'text-white text-xs'
+              'text-white text-xs p-2'
             ]"
             :dir="rowData.dir || undefined"
           >
@@ -92,12 +81,8 @@
 </template>
 
 <script>
-import { sort } from '~/utils/helpers.js'
-import vModel from '~/mixins/vModel.js'
-
 export default {
-  name: 'Table',
-  mixins: [vModel],
+  name: 'CTable',
   props: {
     page: {
       type: [Number, String],
@@ -136,56 +121,21 @@ export default {
         return !isNaN(value)
       }
     },
-    size: {
-      type: String,
-      validator(value) {
-        return ['md', 'sm', 'lg'].includes(value)
-      }
-    },
     hoverEffect: {
       type: Boolean,
       default: false
-    },
-    headerColor: {
-      type: String,
-      validator(value) {
-        return ['transparent', 'grey'].includes(value)
-      },
-      default: 'transparent'
     },
     noDataText: {
       type: String,
       default: undefined
     },
-    linkPath: {
-      type: String,
-      default: undefined
-    },
     searchModel: {
+      type: [Number, String],
       default: undefined
-    },
-    showPagination: {
-      type: Boolean,
-      default: true
     },
     isRowBordersVisible: {
       type: Boolean,
       default: true
-    },
-    defaultSortKey: {
-      type: String,
-      default: null
-    },
-    defaultSortType: {
-      type: String,
-      validator(value) {
-        return ['asc', 'desc'].includes(value)
-      },
-      default: null
-    },
-    selectable: {
-      type: Boolean,
-      default: false
     },
     showHeader: {
       type: Boolean,
@@ -194,15 +144,6 @@ export default {
     stickyHeader: {
       type: Boolean,
       default: false
-    }
-  },
-  data() {
-    return {
-      sortOptions: {
-        sortType: null,
-        sortKey: null
-      },
-      isAllItemsSelected: false
     }
   },
   computed: {
@@ -214,119 +155,46 @@ export default {
         this.$emit('paginate', val)
       }
     },
-    isDefaultSortValueDescendingAndSortTypeIsNull() {
-      return this.defaultSortType === 'desc' && !this.sortOptions.sortType
-    },
-    _headers() {
-      return this.$device.isMobile ? this.mobileHeaders : this.headers
-    },
     noData() {
       return !this.items?.length
     },
-    mobileHeaders() {
-      return this.headers.filter((item) => !item.hideInMobile)
-    },
     slicedItems() {
-      if (
-        !this.showPagination ||
-        this.itemsPerPage >= this.sortedList.length ||
-        this.searchModel
-      )
-        return this.sortedList
+      if (this.itemsPerPage >= this.items.length || this.searchModel)
+        return this.items
       const start = this.itemsPerPage * (this.page - 1)
       const end = start + this.itemsPerPage
-      return this.sortedList.slice(start, end)
-    },
-    sortedList() {
-      const list = [...this.items]
-      if (
-        !this.sortOptions.sortType &&
-        this.defaultSortKey &&
-        this.defaultSortType
-      )
-        return sort(list, this.defaultSortType, this.defaultSortKey)
-      if (!this.sortOptions.sortType) return this.items
-      return sort(list, this.sortOptions.sortType, this.sortOptions.sortKey)
+      return this.items.slice(start, end)
     },
     headerClasses() {
       const defaultClasses = 'group text-sm font-medium p-2 whitespace-nowrap'
-      const bgAndBorderClasses = this.getHeaderClasses(this.headerColor)
-      return [defaultClasses, bgAndBorderClasses]
+      return [defaultClasses]
     },
     rowClasses() {
       const defaultClasses = this.isRowBordersVisible
         ? 'border-b border-secondary-100 last-of-type:border-0'
         : ''
-      const hoverClasses = this.hoverEffect
-        ? 'hover:bg-grey-alpha-50'
-        : undefined
+      const hoverClasses = this.hoverEffect ? 'hover:bg-gray-100' : undefined
       return [defaultClasses, hoverClasses]
-    },
-    sizeClass() {
-      switch (this.size) {
-        case 'sm':
-          return 'p-2'
-        case 'lg':
-          return 'py-4 px-2'
-        default:
-          return 'py-3 px-2'
-      }
     }
   },
   methods: {
-    toggleSelectAll(val) {
-      this.$emit('input', val ? this.items : [])
-    },
-    checkIfItemIsChecked(item) {
-      return this.model.includes(item)
-    },
     handleClick(item) {
       this.$emit('click', item)
     },
     getAlignmentClass(alignment) {
       switch (alignment) {
         case 'right':
-          return 'text-start'
+          return 'text-right'
         case 'left':
-          return 'text-end'
+          return 'text-left'
         case 'center':
           return 'text-center'
         default:
-          return 'text-start'
-      }
-    },
-    getHeaderClasses(color) {
-      switch (color) {
-        case 'grey':
-          return 'text-grey-600 bg-grey-alpha-50 rtl:first-of-type:pr-2 rtl:last-of-type:pl-2 rtl:first-of-type:rounded-tr rtl:first-of-type:rounded-br rtl:last-of-type:rounded-tl rtl:last-of-type:rounded-bl ltr:first-of-type:pl-2  ltr:last-of-type:pr-2  ltr:first-of-type:rounded-tl  ltr:first-of-type:rounded-bl  ltr:last-of-type:rounded-tr  ltr:last-of-type:rounded-br'
-        default:
-          return 'text-[#ffffff9f] bg-secondary-50'
-      }
-    },
-    sort(isSortable, sortKey) {
-      if (!isSortable) return
-      this.sortOptions.sortKey = sortKey
-      switch (this.sortOptions.sortType) {
-        case null:
-          return (this.sortOptions.sortType = 'asc')
-        case 'asc':
-          return (this.sortOptions.sortType = 'desc')
-        case 'desc':
-          return (this.sortOptions.sortType = null)
+          return 'text-left'
       }
     },
     paginate(value) {
       this._page = value
-    },
-    toggleRowItem(rowItem) {
-      if (this.checkIfItemIsChecked(rowItem)) {
-        this.model = this.model.filter((item) => item !== rowItem)
-      } else {
-        this.model.push(rowItem)
-      }
-      if (this.model.length === 1) {
-        this.isAllItemsSelected = false
-      }
     }
   }
 }
