@@ -19,59 +19,65 @@
       <CSkeleton v-for="n in 10" :key="n" class="rounded w-full h-20 sm:h-8" />
     </div>
 
-    <CTable
-      v-else-if="list.length"
-      :items="lazyItems"
-      :items-count="list.length"
-      :items-per-page="list.length"
-      :headers="headers"
-      :search-model="search"
-    >
-      <template #name="{ item }">
-        <div class="flex items-center gap-x-2">
-          <nuxt-img :src="item.image" class="w-7 h-7" />
+    <template v-else-if="list.length">
+      <CTable
+        :items="lazyItems"
+        :items-count="list.length"
+        :items-per-page="list.length"
+        :headers="headers"
+        :search-model="search"
+        class="hidden sm:block"
+      >
+        <template #name="{ item }">
+          <div class="flex items-center gap-x-2">
+            <nuxt-img :src="item.image" class="w-7 h-7" />
 
-          <span class="text-gray-800 text-sm sm:text-base">
-            {{ item.name }}
+            <span class="text-gray-800 text-sm sm:text-base">
+              {{ item.name }}
+            </span>
+
+            <span class="text-gray-400 text-xs sm:text-sm">
+              {{ item.symbol.toUpperCase() }}
+            </span>
+          </div>
+        </template>
+
+        <template #price="{item}">
+          <span class="text-gray-800 text-xs sm:text-sm">
+            ${{ insertComma(item.current_price) }}
           </span>
+        </template>
 
-          <span class="text-gray-400 text-xs sm:text-sm">
-            {{ item.symbol.toUpperCase() }}
+        <template #change="{item}">
+          <span
+            class="text-xs sm:text-sm"
+            :class="
+              changePercentage(item).color === 'green'
+                ? 'text-green-500'
+                : changePercentage(item).color === 'red'
+                ? 'text-red-500'
+                : 'text-gray-500'
+            "
+          >
+            {{ changePercentage(item).value }}
           </span>
-        </div>
-      </template>
+        </template>
 
-      <template #price="{item}">
-        <span class="text-gray-800 text-xs sm:text-sm">
-          ${{ insertComma(item.current_price) }}
-        </span>
-      </template>
+        <template #details="{item}">
+          <nuxt-link :to="`/coin/${item.id}`" class="text-gray-500">
+            <CIcon :name="mdiChevronRight" />
+          </nuxt-link>
+        </template>
+      </CTable>
 
-      <template #change="{item}">
-        <span
-          class="text-xs sm:text-sm"
-          :class="
-            changePercentage(item).color === 'green'
-              ? 'text-green-500'
-              : changePercentage(item).color === 'red'
-              ? 'text-red-500'
-              : 'text-gray-500'
-          "
-        >
-          {{ changePercentage(item).value }}
-        </span>
-      </template>
-
-      <template #details="{item}">
-        <nuxt-link :to="`/coin/${item.id}`" class="text-gray-500">
-          <CIcon :name="mdiChevronRight" />
-        </nuxt-link>
-      </template>
-
-      <template #mobileCard="{ item }">
-        <CoinMobileCard :item="item" />
-      </template>
-    </CTable>
+      <div class="sm:hidden divide-y divide-gray-100">
+        <CoinMobileCard
+          v-for="item in lazyItems"
+          :key="item.symbol"
+          :item="item"
+        />
+      </div>
+    </template>
 
     <div
       v-else

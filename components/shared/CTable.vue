@@ -4,23 +4,6 @@
       <span>Loading...</span>
     </slot>
     <slot v-else-if="loading" name="loading" />
-
-    <template v-if="$scopedSlots['mobileCard']">
-      <div
-        v-for="(rowItem, key) in slicedItems"
-        :key="'mobileCard' + key"
-        :class="[
-          {
-            'md:hidden': $scopedSlots['mobileCard']
-          },
-          rowClasses
-        ]"
-        class="text-xs p-2"
-      >
-        <slot name="mobileCard" :item="rowItem" />
-      </div>
-    </template>
-
     <table v-else class="w-full">
       <thead
         v-show="showHeader"
@@ -47,6 +30,24 @@
         </td>
       </template>
       <tbody>
+        <template v-if="$scopedSlots['mobileCard']">
+          <tr
+            v-for="(rowItem, key) in slicedItems"
+            :key="'mobileCard' + key"
+            :class="{
+              'md:hidden': $scopedSlots['mobileCard']
+            }"
+          >
+            <td
+              class="py-4"
+              :class="{
+                'border-b border-secondary-100': key !== slicedItems.length - 1
+              }"
+            >
+              <slot name="mobileCard" :item="rowItem" />
+            </td>
+          </tr>
+        </template>
         <tr
           v-for="(rowItem, key) in slicedItems"
           :key="key"

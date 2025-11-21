@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full">
+  <div class="w-full py-2">
     <nuxt-link :to="`/coin/${item.id}`" class="flex flex-col gap-y-4 flex-wrap">
       <div class="flex items-center gap-x-2 w-full">
         <nuxt-img :src="item.image" class="w-7 h-7" />
