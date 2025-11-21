@@ -1,7 +1,5 @@
 export const state = () => ({
   list: [],
-  page: 1,
-  perPage: 20,
   loading: false,
   detailLoading: false
 })
@@ -24,9 +22,7 @@ export const actions = {
     const config = {
       params: {
         vs_currency: 'usd',
-        order: 'market_cap_desc',
-        page: 1,
-        per_page: 20
+        order: 'market_cap_desc'
       }
     }
     try {

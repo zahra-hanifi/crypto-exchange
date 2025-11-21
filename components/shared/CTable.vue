@@ -116,7 +116,7 @@ export default {
     },
     itemsPerPage: {
       type: [Number, String],
-      default: 10,
+      default: 20,
       validator(value) {
         return !isNaN(value)
       }

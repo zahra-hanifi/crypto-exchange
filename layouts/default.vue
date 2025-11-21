@@ -7,9 +7,7 @@
     <div
       class="p-4 sm:py-8 bg-gray-100 flex items-center justify-center card-container"
     >
-      <div class="bg-white rounded-xl p-4 overflow-y-auto w-full h-full card">
-        <nuxt />
-      </div>
+      <nuxt />
     </div>
   </div>
 </template>
@@ -18,12 +16,4 @@
 .card-container {
   min-height: calc(100vh - 61px);
 }
-
-@media (min-width: 640px) {
-  .card {
-    height: 600px;
-    width: 700px;
-  }
-}
 </style>
-<script setup lang="ts"></script>

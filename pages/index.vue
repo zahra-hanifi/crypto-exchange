@@ -1,5 +1,8 @@
 <template>
-  <div class="flex flex-col gap-y-4">
+  <div
+    class="bg-white rounded-xl p-4 overflow-y-auto w-full h-full flex flex-col gap-y-4 card"
+    ref="wrapper"
+  >
     <div class="flex items-center justify-between">
       <h1 class="font-medium text-xl">Currencies List</h1>
 
@@ -18,8 +21,9 @@
 
     <CTable
       v-else-if="list.length"
-      :items="list"
-      :items-count="1000"
+      :items="lazyItems"
+      :items-count="list.length"
+      :items-per-page="list.length"
       :headers="headers"
       :search-model="search"
     >
@@ -95,7 +99,9 @@ export default {
         { text: '24h %', value: 'change' },
         { text: '', value: 'details' }
       ],
-      search: ''
+      search: '',
+      items: [],
+      shownCount: 20
     }
   },
   computed: {
@@ -114,6 +120,27 @@ export default {
     },
     loading() {
       return this.$store.state.coins.loading
+    },
+    lazyItems() {
+      if (this.search.trim() === '')
+        return this.items.length ? this.items : this.list?.slice(0, 20)
+      else return this.list
+    }
+  },
+  mounted() {
+    this.items = this.list.slice(0, 20)
+
+    this.$watch('list', () => {
+      this.items = this.list.slice(0, 20)
+    })
+
+    const wrapper = this.$refs.wrapper
+    if (wrapper) {
+      wrapper.addEventListener('scroll', () => {
+        if (wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight) {
+          this.loadMore()
+        }
+      })
     }
   },
   methods: {
@@ -122,10 +149,27 @@ export default {
     debounce,
     debounceSearch: debounce(function(value) {
       this.search = value
-    })
+    }),
+    loadMore() {
+      for (let i = this.shownCount; i < this.shownCount + 20; i++) {
+        if (this.list[i]) {
+          this.items.push(this.list[i])
+        }
+      }
+      this.shownCount = this.shownCount + 20
+    }
   },
   head() {
     return { title: 'Crypto Exchange | Coins List' }
   }
 }
 </script>
+
+<style scoped>
+@media (min-width: 640px) {
+  .card {
+    height: 600px;
+    width: 700px;
+  }
+}
+</style>

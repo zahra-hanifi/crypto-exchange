@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col gap-y-8 sm:p-3">
+  <div
+    class="bg-white rounded-xl p-4 sm:p-7 overflow-y-auto w-full h-full card flex flex-col gap-y-8"
+  >
     <h1 class="font-medium text-xl">Currency Details</h1>
 
     <div class="flex flex-col gap-y-3">
@@ -191,3 +193,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@media (min-width: 640px) {
+  .card {
+    height: 600px;
+    width: 700px;
+  }
+}
+</style>

@@ -6,6 +6,7 @@
 import Chart from 'chart.js/auto'
 
 export default {
+  name: 'CoinPriceChart',
   props: {
     data: {
       type: Array,
