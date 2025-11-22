@@ -69,7 +69,7 @@
       >
         <span class="text-gray-500 text-xs sm:text-sm">{{ label }}</span>
 
-        <DataLoader :loading="loading" skeletonClass="h-5 sm:h-6 w-32 rounded">
+        <DataLoader :loading="loading" skeleton-class="h-5 sm:h-6 w-32 rounded">
           <template #content>
             <span class="text-sm sm:text-base text-gray-900 font-medium">
               ${{ insertComma(item) }}

@@ -8,6 +8,7 @@ export default {
   props: {
     animation: {
       type: String,
+
       default: 'pulse',
       validator(value) {
         return ['pulse', 'moving-shadow'].includes(value)

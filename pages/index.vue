@@ -1,7 +1,7 @@
 <template>
   <div
-    class="bg-white rounded-xl p-4 overflow-y-auto w-full h-full flex flex-col gap-y-4 card"
     ref="wrapper"
+    class="bg-white rounded-xl p-4 overflow-y-auto w-full h-full flex flex-col gap-y-4 card"
   >
     <div class="flex items-center justify-between gap-3 flex-wrap">
       <h1 class="font-medium text-xl">Currencies List</h1>
