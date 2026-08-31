@@ -4,7 +4,7 @@ A cryptocurrency market dashboard built with Nuxt.js and Tailwind CSS. Browse li
 
 **[Live demo →](https://crypto-exchange-six-kappa.vercel.app/)**
 
-> _Screenshot goes here — add one before publishing._
+![Coins list](./screenshots/coins-list.png)
 
 ---
 
