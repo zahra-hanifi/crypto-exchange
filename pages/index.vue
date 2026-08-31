@@ -148,12 +148,20 @@ export default {
 
     const wrapper = this.$refs.wrapper
     if (wrapper) {
-      wrapper.addEventListener('scroll', () => {
+      this.onScroll = () => {
         if (wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight) {
           this.loadMore()
         }
-      })
+      }
+      wrapper.addEventListener('scroll', this.onScroll, { passive: true })
     }
+  },
+  beforeDestroy() {
+    const wrapper = this.$refs.wrapper
+    if (wrapper && this.onScroll) {
+      wrapper.removeEventListener('scroll', this.onScroll)
+    }
+    this.debounceSearch.cancel()
   },
   methods: {
     insertComma,

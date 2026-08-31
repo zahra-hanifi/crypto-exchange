@@ -53,9 +53,14 @@ export function getCoinChangeData(changePercentage) {
 
 export function debounce(fn, delay = 500) {
   let timer
-  return function(...args) {
+
+  function debounced(...args) {
     const context = this
     clearTimeout(timer)
     timer = setTimeout(() => fn.apply(context, args), delay)
   }
+
+  debounced.cancel = () => clearTimeout(timer)
+
+  return debounced
 }
