@@ -121,13 +121,24 @@ import {
 export default {
   name: 'CoinDetails',
   components: { CoinPriceChart, CTabs, DataLoader },
-  async asyncData({ store, route }) {
-    const { data } = await store.dispatch(
-      'coins/fetchCoinDetails',
-      route.params.id
-    )
+  async asyncData({ store, route, error }) {
+    try {
+      const data = await store.dispatch(
+        'coins/fetchCoinDetails',
+        route.params.id
+      )
+      return { data }
+    } catch (requestError) {
+      const statusCode = requestError.response
+        ? requestError.response.status
+        : 500
 
-    return { data }
+      error({
+        statusCode,
+        message:
+          statusCode === 404 ? 'Coin not found' : 'Could not load coin details'
+      })
+    }
   },
   data() {
     return {
@@ -186,6 +197,9 @@ export default {
         .getCoinChart(this.coinId, config)
         .then((response) => {
           this.coinPriceChangesData = response.data.prices
+        })
+        .catch(() => {
+          this.coinPriceChangesData = null
         })
         .finally(() => {
           this.loadingChart = false

@@ -71,11 +71,7 @@
       </CTable>
 
       <div class="sm:hidden divide-y divide-gray-100">
-        <CoinMobileCard
-          v-for="item in lazyItems"
-          :key="item.symbol"
-          :item="item"
-        />
+        <CoinMobileCard v-for="item in lazyItems" :key="item.id" :item="item" />
       </div>
     </template>
 
@@ -96,6 +92,8 @@ import CIcon from '@/components/shared/CIcon.vue'
 import CoinMobileCard from '@/components/CoinMobileCard.vue'
 import CSkeleton from '@/components/shared/CSkeleton.vue'
 
+const PAGE_SIZE = 20
+
 export default {
   name: 'HomePage',
   components: { CTable, CIcon, CoinMobileCard, CSkeleton },
@@ -112,8 +110,7 @@ export default {
         { text: '', value: 'details' }
       ],
       search: '',
-      items: [],
-      shownCount: 20
+      shownCount: PAGE_SIZE
     }
   },
   computed: {
@@ -134,18 +131,21 @@ export default {
       return this.$store.state.coins.loading
     },
     lazyItems() {
-      if (this.search.trim() === '')
-        return this.items.length ? this.items : this.list?.slice(0, 20)
-      else return this.list
+      if (this.search.trim() !== '') return this.list
+      return this.list.slice(0, this.shownCount)
     }
   },
-  mounted() {
-    this.items = this.list.slice(0, 20)
-
-    this.$watch('list', () => {
-      this.items = this.list.slice(0, 20)
+  watch: {
+    list() {
+      this.shownCount = PAGE_SIZE
+    }
+  },
+  created() {
+    this.debouncedSearch = debounce((value) => {
+      this.search = value
     })
-
+  },
+  mounted() {
     const wrapper = this.$refs.wrapper
     if (wrapper) {
       this.onScroll = () => {
@@ -161,22 +161,17 @@ export default {
     if (wrapper && this.onScroll) {
       wrapper.removeEventListener('scroll', this.onScroll)
     }
-    this.debounceSearch.cancel()
+    this.debouncedSearch.cancel()
   },
   methods: {
     insertComma,
     getCoinChangeData,
-    debounce,
-    debounceSearch: debounce(function(value) {
-      this.search = value
-    }),
+    debounceSearch(value) {
+      this.debouncedSearch(value)
+    },
     loadMore() {
-      for (let i = this.shownCount; i < this.shownCount + 20; i++) {
-        if (this.list[i]) {
-          this.items.push(this.list[i])
-        }
-      }
-      this.shownCount = this.shownCount + 20
+      if (this.shownCount >= this.list.length) return
+      this.shownCount = Math.min(this.shownCount + PAGE_SIZE, this.list.length)
     },
     changePercentage(item) {
       return this.getCoinChangeData(item.price_change_percentage_24h)

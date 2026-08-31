@@ -3,17 +3,15 @@ export function insertComma(number) {
     return 0
   }
   if (!number) return ''
-  const sign =
-    number.toString()[0] === '-' || number.toString()[0] === '+'
-      ? number.toString()[0]
-      : ''
+
+  const asString =
+    typeof number === 'number' && Math.abs(number) < 1e-6
+      ? number.toFixed(20).replace(/0+$/, '')
+      : number.toString()
+
+  const sign = asString[0] === '-' || asString[0] === '+' ? asString[0] : ''
   const values =
-    sign !== ''
-      ? number
-          .toString()
-          .substring(1)
-          .split('.')
-      : number.toString().split('.')
+    sign !== '' ? asString.substring(1).split('.') : asString.split('.')
   return sign !== ''
     ? sign +
         values[0].replace(/.(?=(?:.{3})+$)/g, '$&,') +
@@ -28,25 +26,32 @@ export function capitalizeFirstLetter(value) {
 }
 
 export function getCoinChangeData(changePercentage) {
-  let percentage = changePercentage
-  if (changePercentage.toString().includes('-')) {
-    percentage = Number(changePercentage.toString().slice(1))
+  const change = Number(changePercentage)
+
+  if (changePercentage === null || !isFinite(change)) {
+    return {
+      color: 'gray',
+      value: '—'
+    }
   }
 
-  if (changePercentage.toFixed(2) > 0) {
+  const rounded = Number(change.toFixed(2))
+  const value = `${Math.abs(change).toFixed(2)}%`
+
+  if (rounded > 0) {
     return {
       color: 'green',
-      value: `+${percentage.toFixed(2)}%`
+      value: `+${value}`
     }
-  } else if (changePercentage.toFixed(2) < 0) {
+  } else if (rounded < 0) {
     return {
       color: 'red',
-      value: `-${percentage.toFixed(2)}%`
+      value: `-${value}`
     }
   } else {
     return {
       color: 'gray',
-      value: `${percentage.toFixed(2)}%`
+      value
     }
   }
 }

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Chart from 'chart.js/auto'
+import ChartJS from 'chart.js/auto'
 
 export default {
   name: 'CoinPriceChart',
@@ -20,7 +20,7 @@ export default {
 
     const ctx = this.$refs.canvas.getContext('2d')
 
-    this.chart = new Chart(ctx, {
+    this.chart = new ChartJS(ctx, {
       type: 'line',
       data: {
         labels,
