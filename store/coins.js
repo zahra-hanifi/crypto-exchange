@@ -28,8 +28,8 @@ export const actions = {
     try {
       const response = await this.$api.coins.getCoins(config)
       commit('setList', response.data)
-    } catch (error) {
-      console.log(`Coins list error: ${error}`)
+    } catch {
+      commit('setList', [])
     } finally {
       commit('setLoading', false)
     }
@@ -37,9 +37,8 @@ export const actions = {
   async fetchCoinDetails({ commit }, id) {
     commit('setDetailLoading', true)
     try {
-      return await this.$api.coins.getCoinDetails(id)
-    } catch (error) {
-      console.log(`Coin details error: ${error}`)
+      const response = await this.$api.coins.getCoinDetails(id)
+      return response.data
     } finally {
       commit('setDetailLoading', false)
     }

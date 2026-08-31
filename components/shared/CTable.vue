@@ -9,7 +9,7 @@
         v-show="showHeader"
         :class="{
           'hidden md:table-header-group': $scopedSlots['mobileCard'],
-          'sticky top-0 !bg-red-600 z-10': stickyHeader
+          'sticky top-0 bg-white z-10': stickyHeader
         }"
       >
         <slot name="headers">
@@ -24,12 +24,14 @@
           </tr>
         </slot>
       </thead>
-      <template v-if="noData">
-        <td :colspan="headers?.length">
-          <slot name="noData">{{ noDataText }} </slot>
-        </td>
-      </template>
-      <tbody>
+      <tbody v-if="noData">
+        <tr>
+          <td :colspan="headers.length" class="p-4 text-center text-gray-500">
+            <slot name="noData">{{ noDataText }}</slot>
+          </td>
+        </tr>
+      </tbody>
+      <tbody v-else>
         <template v-if="$scopedSlots['mobileCard']">
           <tr
             v-for="(rowItem, key) in slicedItems"
@@ -64,7 +66,7 @@
             :key="index"
             :class="[
               getAlignmentClass(rowData.align),
-              'text-white text-xs p-2'
+              'text-gray-800 text-xs p-2'
             ]"
             :dir="rowData.dir || undefined"
           >

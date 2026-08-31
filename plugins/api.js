@@ -1,8 +1,6 @@
 import axios from 'axios'
 import createApi from '~/services/api/index.js'
 
-const apiPromisesCache = new Map()
-
 const addTrailingAndLeadingSlashToUrl = (url) => {
   if (/^(?!https?:).*/.test(url) && !url.startsWith('/')) url = '/' + url
   if (!url.endsWith('/')) url = url + '/'
@@ -15,74 +13,80 @@ const setDefaultConfigs = (config) => {
   return config
 }
 
-export const apiCaller = (apiCallerInstances) => ({
-  get(url, config = {}) {
-    config = setDefaultConfigs(config)
-    const apiCallerInstance = apiCallerInstances[config.instance]
-    if (config.instance === 'default') {
-      url = addTrailingAndLeadingSlashToUrl(url)
-    }
+export const apiCaller = (apiCallerInstances) => {
+  const apiPromisesCache = new Map()
 
-    const key = url + (config.params ? JSON.stringify(config.params) : '')
+  return {
+    get(url, config = {}) {
+      config = setDefaultConfigs(config)
+      const apiCallerInstance = apiCallerInstances[config.instance]
+      if (config.instance === 'default') {
+        url = addTrailingAndLeadingSlashToUrl(url)
+      }
 
-    if (apiPromisesCache.has(key)) {
-      return apiPromisesCache.get(key)
-    }
+      const key =
+        config.instance +
+        ' ' +
+        url +
+        (config.params ? JSON.stringify(config.params) : '')
 
-    const promise = apiCallerInstance.get(url, config)
-    apiPromisesCache.set(key, promise)
+      if (apiPromisesCache.has(key)) {
+        return apiPromisesCache.get(key)
+      }
 
-    promise.finally(() => {
-      apiPromisesCache.delete(key)
-    })
+      const promise = apiCallerInstance.get(url, config)
+      apiPromisesCache.set(key, promise)
 
-    return promise
-  },
-  post(url, config = {}) {
-    config = setDefaultConfigs(config)
-    const apiCallerInstance = apiCallerInstances[config.instance]
-    if (config.instance === 'default') {
-      url = addTrailingAndLeadingSlashToUrl(url)
+      promise
+        .catch(() => {})
+        .finally(() => {
+          apiPromisesCache.delete(key)
+        })
+
+      return promise
+    },
+    post(url, config = {}) {
+      config = setDefaultConfigs(config)
+      const apiCallerInstance = apiCallerInstances[config.instance]
+      if (config.instance === 'default') {
+        url = addTrailingAndLeadingSlashToUrl(url)
+      }
+      return apiCallerInstance.post(url, config.data, config)
+    },
+    put(url, config = {}) {
+      config = setDefaultConfigs(config)
+      const apiCallerInstance = apiCallerInstances[config.instance]
+      if (config.instance === 'default') {
+        url = addTrailingAndLeadingSlashToUrl(url)
+      }
+      return apiCallerInstance.put(url, config.data, config)
+    },
+    patch(url, config = {}) {
+      config = setDefaultConfigs(config)
+      const apiCallerInstance = apiCallerInstances[config.instance]
+      if (config.instance === 'default') {
+        url = addTrailingAndLeadingSlashToUrl(url)
+      }
+      return apiCallerInstance.patch(url, config.data, config)
+    },
+    delete(url, config = {}) {
+      config = setDefaultConfigs(config)
+      const apiCallerInstance = apiCallerInstances[config.instance]
+      if (config.instance === 'default') {
+        url = addTrailingAndLeadingSlashToUrl(url)
+      }
+      return apiCallerInstance.delete(url, config)
     }
-    return apiCallerInstance.post(url, config.data, config)
-  },
-  put(url, config = {}) {
-    config = setDefaultConfigs(config)
-    const apiCallerInstance = apiCallerInstances[config.instance]
-    if (config.instance === 'default') {
-      url = addTrailingAndLeadingSlashToUrl(url)
-    }
-    return apiCallerInstance.put(url, config.data, config)
-  },
-  patch(url, config = {}) {
-    config = setDefaultConfigs(config)
-    const apiCallerInstance = apiCallerInstances[config.instance]
-    if (config.instance === 'default') {
-      url = addTrailingAndLeadingSlashToUrl(url)
-    }
-    return apiCallerInstance.patch(url, config.data, config)
-  },
-  delete(url, config = {}) {
-    config = setDefaultConfigs(config)
-    const apiCallerInstance = apiCallerInstances[config.instance]
-    if (config.instance === 'default') {
-      url = addTrailingAndLeadingSlashToUrl(url)
-    }
-    return apiCallerInstance.delete(url, config)
   }
-})
+}
 
-export default function({ $axios, $config }, inject) {
+export default function({ $axios }, inject) {
   const generalAxiosInstance = axios.create()
 
   const axiosInstances = {
     default: $axios,
     general: generalAxiosInstance
   }
-
-  Object.values(axiosInstances).forEach((instance) => {
-    instance.interceptors.response.use()
-  })
 
   inject('api', createApi(apiCaller(axiosInstances)))
 }

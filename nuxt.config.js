@@ -27,8 +27,10 @@ export default {
       browserBaseURL: process.env.API_BASE_URL
     }
   },
+  generate: {
+    interval: 2000
+  },
   build: {
-    extend(config, ctx) {},
     transpile: ['chart.js']
   }
 }
